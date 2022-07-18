@@ -1,7 +1,6 @@
 package ginmetrics
 
 import (
-	"fmt"
 	"strconv"
 	"time"
 
@@ -29,7 +28,7 @@ func (m *Monitor) Use(r gin.IRoutes) {
 
 	r.Use(m.monitorInterceptor)
 	r.GET(m.metricPath, func(ctx *gin.Context) {
-		promhttp.Handler().ServeHTTP(ctx.Writer, ctx.Request)
+		promhttp.HandlerFor(m.registry, promhttp.HandlerOpts{}).ServeHTTP(ctx.Writer, ctx.Request)
 	})
 }
 
@@ -54,49 +53,49 @@ func (m *Monitor) Expose(r gin.IRoutes) {
 func (m *Monitor) initGinMetrics() {
 	bloomFilter = bloom.NewBloomFilter()
 
-	_ = monitor.AddMetric(&Metric{
-		Type:        Counter,
-		Name:        metricRequestTotal,
-		Description: "all the server received request num.",
-		Labels:      nil,
-	})
-	_ = monitor.AddMetric(&Metric{
-		Type:        Counter,
-		Name:        metricRequestUVTotal,
-		Description: "all the server received ip num.",
-		Labels:      nil,
-	})
+	// _ = monitor.AddMetric(&Metric{
+	// 	Type:        Counter,
+	// 	Name:        metricRequestTotal,
+	// 	Description: "all the server received request num.",
+	// 	Labels:      nil,
+	// })
+	// _ = monitor.AddMetric(&Metric{
+	// 	Type:        Counter,
+	// 	Name:        metricRequestUVTotal,
+	// 	Description: "all the server received ip num.",
+	// 	Labels:      nil,
+	// })
 	_ = monitor.AddMetric(&Metric{
 		Type:        Counter,
 		Name:        metricURIRequestTotal,
 		Description: "all the server received request num with every uri.",
 		Labels:      []string{"uri", "method", "code"},
 	})
-	_ = monitor.AddMetric(&Metric{
-		Type:        Counter,
-		Name:        metricRequestBody,
-		Description: "the server received request body size, unit byte",
-		Labels:      nil,
-	})
-	_ = monitor.AddMetric(&Metric{
-		Type:        Counter,
-		Name:        metricResponseBody,
-		Description: "the server send response body size, unit byte",
-		Labels:      nil,
-	})
-	_ = monitor.AddMetric(&Metric{
-		Type:        Histogram,
-		Name:        metricRequestDuration,
-		Description: "the time server took to handle the request.",
-		Labels:      []string{"uri"},
-		Buckets:     m.reqDuration,
-	})
-	_ = monitor.AddMetric(&Metric{
-		Type:        Counter,
-		Name:        metricSlowRequest,
-		Description: fmt.Sprintf("the server handled slow requests counter, t=%d.", m.slowTime),
-		Labels:      []string{"uri", "method", "code"},
-	})
+	// _ = monitor.AddMetric(&Metric{
+	// 	Type:        Counter,
+	// 	Name:        metricRequestBody,
+	// 	Description: "the server received request body size, unit byte",
+	// 	Labels:      nil,
+	// })
+	// _ = monitor.AddMetric(&Metric{
+	// 	Type:        Counter,
+	// 	Name:        metricResponseBody,
+	// 	Description: "the server send response body size, unit byte",
+	// 	Labels:      nil,
+	// })
+	// _ = monitor.AddMetric(&Metric{
+	// 	Type:        Histogram,
+	// 	Name:        metricRequestDuration,
+	// 	Description: "the time server took to handle the request.",
+	// 	Labels:      []string{"uri"},
+	// 	Buckets:     m.reqDuration,
+	// })
+	// _ = monitor.AddMetric(&Metric{
+	// 	Type:        Counter,
+	// 	Name:        metricSlowRequest,
+	// 	Description: fmt.Sprintf("the server handled slow requests counter, t=%d.", m.slowTime),
+	// 	Labels:      []string{"uri", "method", "code"},
+	// })
 }
 
 // monitorInterceptor as gin monitor middleware.

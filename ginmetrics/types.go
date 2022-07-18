@@ -36,6 +36,7 @@ type Monitor struct {
 	metricPath  string
 	reqDuration []float64
 	metrics     map[string]*Metric
+	registry    *prometheus.Registry
 }
 
 // GetMonitor used to get global Monitor object,
@@ -47,6 +48,7 @@ func GetMonitor() *Monitor {
 			slowTime:    defaultSlowTime,
 			reqDuration: defaultDuration,
 			metrics:     make(map[string]*Metric),
+			registry:    prometheus.NewRegistry(),
 		}
 	}
 	return monitor
@@ -109,7 +111,7 @@ func (m *Monitor) AddMetric(metric *Metric) error {
 	}
 	if f, ok := promTypeHandler[metric.Type]; ok {
 		if err := f(metric); err == nil {
-			prometheus.MustRegister(metric.vec)
+			m.registry.MustRegister(metric.vec)
 			m.metrics[metric.Name] = metric
 			return nil
 		}
